@@ -3,30 +3,30 @@ package solutions.silly.wearnetatmo.model
 import com.squareup.moshi.Json
 
 data class DeviceDashboardData(
-    @Json(name = "time_utc")
+    @field:Json(name = "time_utc")
     val timeUtc: Long?,
-    @Json(name = "Temperature")
+    @field:Json(name = "Temperature")
     val temperature: Double?,
-    @Json(name = "CO2")
+    @field:Json(name = "CO2")
     val co2: Long?,
-    @Json(name = "Humidity")
+    @field:Json(name = "Humidity")
     val humidity: Long?,
-    @Json(name = "Noise")
+    @field:Json(name = "Noise")
     val noise: Long?,
-    @Json(name = "Pressure")
+    @field:Json(name = "Pressure")
     val pressure: Double?,
-    @Json(name = "AbsolutePressure")
+    @field:Json(name = "AbsolutePressure")
     val absolutePressure: Double?,
-    @Json(name = "min_temp")
+    @field:Json(name = "min_temp")
     val minTemp: Double?,
-    @Json(name = "max_temp")
+    @field:Json(name = "max_temp")
     val maxTemp: Double?,
-    @Json(name = "date_max_temp")
+    @field:Json(name = "date_max_temp")
     val dateMaxTemp: Long?,
-    @Json(name = "date_min_temp")
+    @field:Json(name = "date_min_temp")
     val dateMinTemp: Long?,
-    @Json(name = "temp_trend")
+    @field:Json(name = "temp_trend")
     val tempTrend: String?,
-    @Json(name = "pressure_trend")
+    @field:Json(name = "pressure_trend")
     val pressureTrend: String?,
 )

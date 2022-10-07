@@ -20,6 +20,7 @@ import solutions.silly.wearnetatmo.ACCESS_TOKEN_KEY
 import solutions.silly.wearnetatmo.SecretConstants
 import solutions.silly.wearnetatmo.model.Device
 import solutions.silly.wearnetatmo.repository.NetatmoRepository
+import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
 import kotlin.coroutines.resume
@@ -56,7 +57,8 @@ class ConfigViewModel @Inject constructor(
                 .setCodeChallenge(CodeChallenge(codeVerifier))
                 .build()
 
-            val responseUrl = retrieveAuthCode(request).getOrElse {
+            val responseUrl = retrieveAuthCode(request).getOrElse { throwable ->
+                Timber.e(throwable)
                 _uiState.update { currentState ->
                     currentState.copy(
                         authError = true
@@ -66,8 +68,7 @@ class ConfigViewModel @Inject constructor(
             }
 
             val result = netatmoRepository.getToken(
-                code = responseUrl.getQueryParameter("code") ?: "",
-                redirectUri = responseUrl.encodedPath ?: ""
+                code = responseUrl.getQueryParameter("code") ?: ""
             )
             if (result.isFailure) {
                 _uiState.update { currentState ->
@@ -96,12 +97,31 @@ class ConfigViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getWeatherStations() {
-        val result = netatmoRepository.getStationsData()
-        result.getOrNull()?.body?.devices?.let { devices ->
+    fun selectWeatherStation(id: String) {
+        viewModelScope.launch {
+            netatmoRepository.setSelectedStationId(id)
             _uiState.update { currentState ->
                 currentState.copy(
-                    stations = devices
+                    selectedStation = id
+                )
+            }
+        }
+    }
+
+    private suspend fun getWeatherStations() {
+        val result = netatmoRepository.getStationsData()
+        var selectedId = netatmoRepository.getSelectedStationId()
+        result.getOrNull()?.body?.devices?.let { devices ->
+            if (selectedId == null && devices.isNotEmpty()) {
+                devices.first().id?.let { firstId ->
+                    selectedId = firstId
+                    netatmoRepository.setSelectedStationId(firstId)
+                }
+            }
+            _uiState.update { currentState ->
+                currentState.copy(
+                    stations = devices,
+                    selectedStation = selectedId
                 )
             }
         }
@@ -126,13 +146,16 @@ class ConfigViewModel @Inject constructor(
                     ) {
                         val url = response.responseUrl
                         if (url != null) {
+                            Timber.d("Auth successful $url")
                             c.resume(Result.success(url))
                         } else {
+                            Timber.e("Auth failed url is null")
                             c.resume(Result.failure(IOException("Authorization failed")))
                         }
                     }
 
                     override fun onAuthorizationError(request: OAuthRequest, errorCode: Int) {
+                        Timber.e("Auth error: $errorCode")
                         c.resume(Result.failure(IOException("Authorization failed")))
                     }
                 }
@@ -145,5 +168,6 @@ data class ConfigUiState(
     val isLoggedIn: Boolean = false,
     val authError: Boolean = false,
     val stations: List<Device> = emptyList(),
-    val stationsError: Boolean = false
+    val stationsError: Boolean = false,
+    val selectedStation: String? = null
 )

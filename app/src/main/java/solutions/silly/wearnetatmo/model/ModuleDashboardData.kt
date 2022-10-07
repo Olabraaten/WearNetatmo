@@ -3,40 +3,40 @@ package solutions.silly.wearnetatmo.model
 import com.squareup.moshi.Json
 
 data class ModuleDashboardData(
-    @Json(name = "time_utc")
+    @field:Json(name = "time_utc")
     val timeUtc: Long?,
-    @Json(name = "Temperature")
+    @field:Json(name = "Temperature")
     val temperature: Double?,
-    @Json(name = "Humidity")
+    @field:Json(name = "Humidity")
     val humidity: Long?,
-    @Json(name = "min_temp")
+    @field:Json(name = "min_temp")
     val minTemp: Double?,
-    @Json(name = "max_temp")
+    @field:Json(name = "max_temp")
     val maxTemp: Double?,
-    @Json(name = "date_max_temp")
+    @field:Json(name = "date_max_temp")
     val dateMaxTemp: Long?,
-    @Json(name = "date_min_temp")
+    @field:Json(name = "date_min_temp")
     val dateMinTemp: Long?,
-    @Json(name = "temp_trend")
+    @field:Json(name = "temp_trend")
     val tempTrend: String?,
-    @Json(name = "Rain")
+    @field:Json(name = "Rain")
     val rain: Long?,
-    @Json(name = "sum_rain_1")
+    @field:Json(name = "sum_rain_1")
     val sumRain1: Long?,
-    @Json(name = "sum_rain_24")
+    @field:Json(name = "sum_rain_24")
     val sumRain24: Double?,
-    @Json(name = "WindStrength")
+    @field:Json(name = "WindStrength")
     val windStrength: Long?,
-    @Json(name = "WindAngle")
+    @field:Json(name = "WindAngle")
     val windAngle: Long?,
-    @Json(name = "GustStrength")
+    @field:Json(name = "GustStrength")
     val gustStrength: Long?,
-    @Json(name = "GustAngle")
+    @field:Json(name = "GustAngle")
     val gustAngle: Long?,
-    @Json(name = "max_wind_str")
+    @field:Json(name = "max_wind_str")
     val maxWindStr: Long?,
-    @Json(name = "max_wind_angle")
+    @field:Json(name = "max_wind_angle")
     val maxWindAngle: Long?,
-    @Json(name = "date_max_wind_str")
+    @field:Json(name = "date_max_wind_str")
     val dateMaxWindStr: Long?,
 )

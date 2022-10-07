@@ -20,7 +20,7 @@ interface NetatmoService {
         @Field("code") code: String,
         @Field("redirect_uri") redirectUri: String,
         @Field("scope") scope: String,
-    ): Response<NetatmoToken>
+    ): NetatmoToken
 
     @FormUrlEncoded
     @POST("/oauth2/token")
@@ -29,10 +29,10 @@ interface NetatmoService {
         @Field("refresh_token") refreshToken: String,
         @Field("client_id") clientId: String,
         @Field("client_secret") clientSecret: String
-    ): Response<NetatmoToken>
+    ): NetatmoToken
 
     @GET("/api/getstationsdata")
     suspend fun getStationsData(
         @Header("Authorization") bearerToken: String
-    ): Response<StationsData>
+    ): StationsData
 }

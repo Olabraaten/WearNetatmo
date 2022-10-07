@@ -8,8 +8,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import solutions.silly.wearnetatmo.BuildConfig
 import solutions.silly.wearnetatmo.MASTER_KEY_ALIAS
 import solutions.silly.wearnetatmo.SHARED_PREFS_FILENAME
 import solutions.silly.wearnetatmo.api.NetatmoService
@@ -31,7 +34,15 @@ internal object AppModule {
 
     @Provides
     fun provideNetatmoService(): NetatmoService {
+        val logInterceptor = HttpLoggingInterceptor()
+        if (BuildConfig.DEBUG) {
+            logInterceptor.level = HttpLoggingInterceptor.Level.BODY
+        }
+        val client = OkHttpClient.Builder()
+            .addInterceptor(logInterceptor)
+            .build()
         val retrofit = Retrofit.Builder()
+            .client(client)
             .baseUrl("https://api.netatmo.com")
             .addConverterFactory(MoshiConverterFactory.create())
             .build()
