@@ -97,7 +97,11 @@ class NetatmoRepository @Inject constructor(
             Timber.d("Using stored access token")
             return sharedPreferences.getString(ACCESS_TOKEN_KEY, null)
         }
-        // TODO Make sure refresh token exists
+        if (!sharedPreferences.contains(REFRESH_TOKEN_KEY)) {
+            Timber.e("No refresh token found")
+            removeToken()
+            return null
+        }
         try {
             val netatmoToken = netatmoService.refreshToken(
                 grantType = "refresh_token",

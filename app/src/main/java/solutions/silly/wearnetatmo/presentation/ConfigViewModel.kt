@@ -29,17 +29,23 @@ import kotlin.coroutines.suspendCoroutine
 @HiltViewModel
 class ConfigViewModel @Inject constructor(
     @ApplicationContext private val applicationContext: Context,
-    private val sharedPreferences: SharedPreferences,
+    sharedPreferences: SharedPreferences,
     private val netatmoRepository: NetatmoRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ConfigUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
+        val isLoggedIn = sharedPreferences.contains(ACCESS_TOKEN_KEY)
         _uiState.update { currentState ->
             currentState.copy(
-                isLoggedIn = sharedPreferences.contains(ACCESS_TOKEN_KEY)
+                isLoggedIn = isLoggedIn
             )
+        }
+        if (isLoggedIn) {
+            viewModelScope.launch {
+                getWeatherStations()
+            }
         }
     }
 

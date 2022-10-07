@@ -1,8 +1,7 @@
 <resources>
     <string name="app_name">Wear Netatmo</string>
-    <!--
-    This string is used for square devices and overridden by hello_world in
-    values-round/strings.xml for round devices.
-    -->
-    <string name="hello_world">From the Square world,\nHello, %1$s!</string>
+    <string name="log_in_button">Log in</string>
+    <string name="log_in_button_description">On phone</string>
+    <string name="log_out_button">Log out</string>
+    <string name="done_button">Done</string>
 </resources>

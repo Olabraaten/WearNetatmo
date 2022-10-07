@@ -4,17 +4,16 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,8 +24,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.Icon
-import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.RadioButton
+import androidx.wear.compose.material.ScalingLazyColumn
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.ToggleChip
 import dagger.hilt.android.AndroidEntryPoint
@@ -73,41 +72,49 @@ fun ConfigScreen(
     onSelectStationClick: (id: String) -> Unit,
 ) {
     WearNetatmoTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colors.background),
-            verticalArrangement = Arrangement.Center,
+        ScalingLazyColumn(
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (!uiState.isLoggedIn) {
-                Chip(
-                    label = {
-                        Text(text = "Log in")
-                    },
-                    secondaryLabel = {
-                        Text(text = "On phone")
-                    },
-                    icon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_send_to_mobile),
-                            contentDescription = null
-                        )
-                    },
-                    onClick = onAuthClick
-                )
-            } else {
-                Chip(
-                    label = {
-                        Text(text = "Log out")
-                    },
-                    onClick = onAuthClick
-                )
+            item {
+                if (!uiState.isLoggedIn) {
+                    Chip(
+                        label = {
+                            Text(text = stringResource(id = R.string.log_in_button))
+                        },
+                        secondaryLabel = {
+                            Text(text = stringResource(id = R.string.log_in_button_description))
+                        },
+                        icon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_send_to_mobile),
+                                contentDescription = null
+                            )
+                        },
+                        onClick = onAuthClick
+                    )
+                } else {
+                    Chip(
+                        label = {
+                            Text(text = stringResource(id = R.string.log_out_button))
+                        },
+                        onClick = onAuthClick
+                    )
+                }
             }
             if (uiState.stations.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(16.dp))
-                uiState.stations.forEach { device ->
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+                items(
+                    count = uiState.stations.size,
+                    key = { index ->
+                        uiState.stations[index].id.orEmpty()
+                    }
+                ) { index ->
+                    val device = uiState.stations[index]
                     ToggleChip(
+                        modifier = Modifier.fillMaxWidth(),
                         checked = uiState.selectedStation == device.id,
                         onCheckedChange = { isChecked ->
                             if (isChecked) {
@@ -129,11 +136,15 @@ fun ConfigScreen(
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = onExitClick
-            ) {
-                Text(text = "Done")
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            item {
+                Button(
+                    onClick = onExitClick
+                ) {
+                    Text(text = stringResource(id = R.string.done_button))
+                }
             }
         }
     }
