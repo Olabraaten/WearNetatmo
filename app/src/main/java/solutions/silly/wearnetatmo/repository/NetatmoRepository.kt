@@ -12,6 +12,7 @@ import solutions.silly.wearnetatmo.SELECTED_STATION_KEY
 import solutions.silly.wearnetatmo.SecretConstants
 import solutions.silly.wearnetatmo.SecretConstants.NETATMO_REDIRECT_URI
 import solutions.silly.wearnetatmo.api.NetatmoService
+import solutions.silly.wearnetatmo.model.Device
 import solutions.silly.wearnetatmo.model.NetatmoToken
 import solutions.silly.wearnetatmo.model.StationsData
 import timber.log.Timber
@@ -77,6 +78,13 @@ class NetatmoRepository @Inject constructor(
             }
         }
         return Result.failure(IOException("Fetching stations data failed"))
+    }
+
+    suspend fun getSelectedStation(): Device? {
+        getSelectedStationId()?.let { stationId ->
+            return getStationsData().getOrNull()?.body?.devices?.find { it.id == stationId }
+        }
+        return null
     }
 
     fun getSelectedStationId(): String? {
