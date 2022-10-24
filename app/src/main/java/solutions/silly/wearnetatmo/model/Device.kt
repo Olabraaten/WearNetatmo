@@ -20,7 +20,7 @@ data class Device(
     @field:Json(name = "last_upgrade")
     val lastUpgrade: Long?,
     @field:Json(name = "wifi_status")
-    val wifiStatus: Long?,
+    val wifiStatus: Int?,
     val reachable: Boolean?,
     @field:Json(name = "co2_calibrating")
     val co2Calibrating: Boolean?,

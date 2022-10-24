@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import retrofit2.HttpException
 import solutions.silly.wearnetatmo.ACCESS_TOKEN_KEY
 import solutions.silly.wearnetatmo.CACHE_DURATION
 import solutions.silly.wearnetatmo.EXPIRES_TOKEN_KEY
@@ -62,13 +63,14 @@ class NetatmoRepository @Inject constructor(
     suspend fun getStationsData(): Result<StationsData> {
         if (stationsDataCacheExpiresTimestamp < Date().time) {
             try {
-                val accessToken = getFreshAccessToken()
-                val stationsData = netatmoService.getStationsData(
-                    bearerToken = "Bearer $accessToken"
-                )
-                stationsDataCache = stationsData
-                stationsDataCacheExpiresTimestamp = Date().time + CACHE_DURATION
-                return Result.success(stationsData)
+                getFreshAccessToken()?.let { accessToken ->
+                    val stationsData = netatmoService.getStationsData(
+                        bearerToken = "Bearer $accessToken"
+                    )
+                    stationsDataCache = stationsData
+                    stationsDataCacheExpiresTimestamp = Date().time + CACHE_DURATION
+                    return Result.success(stationsData)
+                }
             } catch (e: Exception) {
                 Timber.e(e)
             }
@@ -101,7 +103,7 @@ class NetatmoRepository @Inject constructor(
 
     private suspend fun getFreshAccessToken(): String? {
         val expires = sharedPreferences.getLong(EXPIRES_TOKEN_KEY, 0)
-        if (Date().time < expires) {
+        if (Date().time < expires - 1000) {
             Timber.d("Using stored access token")
             return sharedPreferences.getString(ACCESS_TOKEN_KEY, null)
         }
@@ -121,7 +123,9 @@ class NetatmoRepository @Inject constructor(
             return netatmoToken.accessToken
         } catch (e: Exception) {
             Timber.e(e)
-            removeToken()
+            if (e is HttpException) {
+                removeToken()
+            }
         }
         return null
     }
@@ -129,11 +133,17 @@ class NetatmoRepository @Inject constructor(
     private suspend fun saveToken(netatmoToken: NetatmoToken) {
         Timber.d("Saving token $netatmoToken")
         withContext(Dispatchers.IO) {
-            val expires = Date().time + ((netatmoToken.expiresIn ?: 0) * 1000)
             sharedPreferences.edit {
-                putString(ACCESS_TOKEN_KEY, netatmoToken.accessToken)
-                putString(REFRESH_TOKEN_KEY, netatmoToken.refreshToken)
-                putLong(EXPIRES_TOKEN_KEY, expires)
+                netatmoToken.accessToken?.let { accessToken ->
+                    putString(ACCESS_TOKEN_KEY, accessToken)
+                }
+                netatmoToken.refreshToken?.let { refreshToken ->
+                    putString(REFRESH_TOKEN_KEY, refreshToken)
+                }
+                netatmoToken.expiresIn?.let { expiresIn ->
+                    val expires = Date().time + (expiresIn * 1000)
+                    putLong(EXPIRES_TOKEN_KEY, expires)
+                }
             }
         }
     }

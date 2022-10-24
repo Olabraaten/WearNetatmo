@@ -8,35 +8,35 @@ data class ModuleDashboardData(
     @field:Json(name = "Temperature")
     val temperature: Double?,
     @field:Json(name = "Humidity")
-    val humidity: Long?,
+    val humidity: Double?,
     @field:Json(name = "min_temp")
     val minTemp: Double?,
     @field:Json(name = "max_temp")
     val maxTemp: Double?,
     @field:Json(name = "date_max_temp")
-    val dateMaxTemp: Long?,
+    val dateMaxTemp: Double?,
     @field:Json(name = "date_min_temp")
-    val dateMinTemp: Long?,
+    val dateMinTemp: Double?,
     @field:Json(name = "temp_trend")
     val tempTrend: String?,
     @field:Json(name = "Rain")
-    val rain: Long?,
+    val rain: Double?,
     @field:Json(name = "sum_rain_1")
-    val sumRain1: Long?,
+    val sumRain1: Double?,
     @field:Json(name = "sum_rain_24")
     val sumRain24: Double?,
     @field:Json(name = "WindStrength")
-    val windStrength: Long?,
+    val windStrength: Double?,
     @field:Json(name = "WindAngle")
-    val windAngle: Long?,
+    val windAngle: Double?,
     @field:Json(name = "GustStrength")
-    val gustStrength: Long?,
+    val gustStrength: Double?,
     @field:Json(name = "GustAngle")
-    val gustAngle: Long?,
+    val gustAngle: Double?,
     @field:Json(name = "max_wind_str")
-    val maxWindStr: Long?,
+    val maxWindStr: Double?,
     @field:Json(name = "max_wind_angle")
-    val maxWindAngle: Long?,
+    val maxWindAngle: Double?,
     @field:Json(name = "date_max_wind_str")
     val dateMaxWindStr: Long?,
 )

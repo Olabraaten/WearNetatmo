@@ -55,7 +55,7 @@ class ConfigViewModel @Inject constructor(
             val uri = Uri.Builder()
                 .encodedPath("https://api.netatmo.com/oauth2/authorize")
                 .appendQueryParameter("scope", "read_station")
-                .appendQueryParameter("state", "random")
+                .appendQueryParameter("state", getRandomString(10))
                 .build()
             val request = OAuthRequest.Builder(applicationContext)
                 .setAuthProviderUrl(uri)
@@ -152,6 +152,11 @@ class ConfigViewModel @Inject constructor(
                     ) {
                         val url = response.responseUrl
                         if (url != null) {
+                            if (url.getQueryParameter("state") !=
+                                request.requestUrl.getQueryParameter("state")
+                            ) {
+                                c.resume(Result.failure(IOException("Authorization failed, state doesn't match")))
+                            }
                             Timber.d("Auth successful $url")
                             c.resume(Result.success(url))
                         } else {
@@ -167,6 +172,13 @@ class ConfigViewModel @Inject constructor(
                 }
                 )
         }
+    }
+
+    private fun getRandomString(length: Int): String {
+        val charset = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+        return (1..length)
+            .map { charset.random() }
+            .joinToString("")
     }
 }
 

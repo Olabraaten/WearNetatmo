@@ -8,11 +8,11 @@ data class DeviceDashboardData(
     @field:Json(name = "Temperature")
     val temperature: Double?,
     @field:Json(name = "CO2")
-    val co2: Long?,
+    val co2: Int?,
     @field:Json(name = "Humidity")
-    val humidity: Long?,
+    val humidity: Int?,
     @field:Json(name = "Noise")
-    val noise: Long?,
+    val noise: Int?,
     @field:Json(name = "Pressure")
     val pressure: Double?,
     @field:Json(name = "AbsolutePressure")

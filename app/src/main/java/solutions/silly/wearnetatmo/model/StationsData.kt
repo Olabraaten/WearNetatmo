@@ -6,7 +6,7 @@ data class StationsData(
     val body: Body?,
     val status: String?,
     @field:Json(name = "time_exec")
-    val timeExec: Double?,
+    val timeExec: String?,
     @field:Json(name = "time_server")
-    val timeServer: Long?,
+    val timeServer: String?,
 )

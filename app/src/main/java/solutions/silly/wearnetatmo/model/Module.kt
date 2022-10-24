@@ -21,9 +21,9 @@ data class Module(
     @field:Json(name = "last_seen")
     val lastSeen: Long?,
     @field:Json(name = "rf_status")
-    val rfStatus: Long?,
+    val rfStatus: Int?,
     @field:Json(name = "battery_vp")
-    val batteryVp: Long?,
+    val batteryVp: Int?,
     @field:Json(name = "dashboard_data")
     val dashboardData: ModuleDashboardData?,
 )

@@ -7,9 +7,9 @@ data class Administrative(
     @field:Json(name = "reg_locale")
     val regLocale: String?,
     val lang: String?,
-    val unit: Long?,
-    val windunit: Long?,
-    val pressureunit: Long?,
+    val unit: Int?, // 0 -> metric system, 1 -> imperial system
+    val windunit: Int?, // 0 -> kph, 1 -> mph, 2 -> ms, 3 -> beaufort, 4 -> knot
+    val pressureunit: Int?, // 0 -> mbar, 1 -> inHg, 2 -> mmHg
     @field:Json(name = "feel_like_algo")
-    val feelLikeAlgo: Long?,
+    val feelLikeAlgo: Int?, // algorithm used to compute feel like temperature, 0 -> humidex, 1 -> heat-index
 )
