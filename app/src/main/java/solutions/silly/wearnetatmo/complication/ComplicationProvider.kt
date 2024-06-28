@@ -1,5 +1,6 @@
 package solutions.silly.wearnetatmo.complication
 
+import android.content.ComponentName
 import android.graphics.drawable.Icon
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationType
@@ -34,9 +35,17 @@ class ComplicationProvider : SuspendingComplicationDataSourceService() {
             .build()
     }
 
-    override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData? {
+    override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
         Timber.d("Updating complication data")
         return netatmoRepository.getSelectedStation()?.let { station ->
+            val thisDataSource = ComponentName(this, javaClass)
+            val complicationPendingIntent =
+                ComplicationTapBroadcastReceiver.getToggleIntent(
+                    this,
+                    thisDataSource,
+                    request.complicationInstanceId
+                )
+
             val inside = station.dashboardData?.temperature.toString()
             val outside =
                 station.modules?.find { it.type == "NAModule1" }?.dashboardData?.temperature.toString()
@@ -51,14 +60,7 @@ class ComplicationProvider : SuspendingComplicationDataSourceService() {
                 text = text,
                 contentDescription = text
             ).setTitle(title)
-                .setMonochromaticImage(
-                    MonochromaticImage.Builder(
-                        Icon.createWithResource(
-                            this,
-                            R.drawable.ic_thermostat
-                        )
-                    ).build()
-                )
+                .setTapAction(complicationPendingIntent)
                 .build()
         } ?: makeErrorText()
     }

@@ -54,6 +54,8 @@
                 android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS"
                 android:value="900" />
         </service>
+
+        <receiver android:name=".complication.ComplicationTapBroadcastReceiver" />
     </application>
 
 </manifest>
