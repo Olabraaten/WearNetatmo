@@ -1,16 +1,14 @@
 package solutions.silly.wearnetatmo.complication
 
+import android.app.PendingIntent
 import android.content.ComponentName
-import android.graphics.drawable.Icon
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationType
-import androidx.wear.watchface.complications.data.MonochromaticImage
 import androidx.wear.watchface.complications.data.PlainComplicationText
 import androidx.wear.watchface.complications.data.ShortTextComplicationData
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import dagger.hilt.android.AndroidEntryPoint
-import solutions.silly.wearnetatmo.R
 import solutions.silly.wearnetatmo.repository.NetatmoRepository
 import timber.log.Timber
 import javax.inject.Inject
@@ -37,45 +35,61 @@ class ComplicationProvider : SuspendingComplicationDataSourceService() {
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
         Timber.d("Updating complication data")
-        return netatmoRepository.getSelectedStation()?.let { station ->
-            val thisDataSource = ComponentName(this, javaClass)
-            val complicationPendingIntent =
-                ComplicationTapBroadcastReceiver.getToggleIntent(
-                    this,
-                    thisDataSource,
-                    request.complicationInstanceId
-                )
+        val thisDataSource = ComponentName(this, javaClass)
+        val complicationPendingIntent =
+            ComplicationTapBroadcastReceiver.getToggleIntent(
+                this,
+                thisDataSource,
+                request.complicationInstanceId
+            )
 
-            val inside = station.dashboardData?.temperature.toString()
-            val outside =
-                station.modules?.find { it.type == "NAModule1" }?.dashboardData?.temperature.toString()
+        val stationResult = netatmoRepository.getSelectedStation()
 
-            val title = PlainComplicationText.Builder(
-                text = inside
-            ).build()
-            val text = PlainComplicationText.Builder(
-                text = outside
-            ).build()
-            ShortTextComplicationData.Builder(
-                text = text,
-                contentDescription = text
-            ).setTitle(title)
-                .setTapAction(complicationPendingIntent)
-                .build()
-        } ?: makeErrorText()
+        if (stationResult.isSuccess) {
+            stationResult.getOrNull()?.let { station ->
+                val inside = station.dashboardData?.temperature.toString()
+                val outside =
+                    station.modules?.find { it.type == "NAModule1" }?.dashboardData?.temperature.toString()
+
+                val title = PlainComplicationText.Builder(
+                    text = inside
+                ).build()
+                val text = PlainComplicationText.Builder(
+                    text = outside
+                ).build()
+                return ShortTextComplicationData.Builder(
+                    text = text,
+                    contentDescription = text
+                ).setTitle(title)
+                    .setTapAction(complicationPendingIntent)
+                    .build()
+            }
+        }
+
+        return makeErrorText(stationResult.exceptionOrNull(), complicationPendingIntent)
     }
 
-    private fun makeErrorText(): ShortTextComplicationData {
+    private fun makeErrorText(
+        exception: Throwable?,
+        complicationPendingIntent: PendingIntent
+    ): ShortTextComplicationData {
         val title = PlainComplicationText.Builder(
-            text = "Data"
+            text = when {
+                exception is IllegalAccessException -> "Log"
+                else -> "Data"
+            }
         ).build()
         val text = PlainComplicationText.Builder(
-            text = "Error"
+            text = when {
+                exception is IllegalAccessException -> "in"
+                else -> "Error"
+            }
         ).build()
         return ShortTextComplicationData.Builder(
             text = text,
             contentDescription = text
         ).setTitle(title)
+            .setTapAction(complicationPendingIntent)
             .build()
     }
 }

@@ -70,6 +70,8 @@ class NetatmoRepository @Inject constructor(
                     stationsDataCache = stationsData
                     stationsDataCacheExpiresTimestamp = Date().time + CACHE_DURATION
                     return Result.success(stationsData)
+                } ?: run {
+                    return Result.failure(IllegalAccessException())
                 }
             } catch (e: Exception) {
                 Timber.e(e)
@@ -82,11 +84,18 @@ class NetatmoRepository @Inject constructor(
         return Result.failure(IOException("Fetching stations data failed"))
     }
 
-    suspend fun getSelectedStation(): Device? {
-        getSelectedStationId()?.let { stationId ->
-            return getStationsData().getOrNull()?.body?.devices?.find { it.id == stationId }
+    suspend fun getSelectedStation(): Result<Device?> {
+        val stationsData = getStationsData()
+        if (stationsData.isSuccess) {
+            getSelectedStationId()?.let { stationId ->
+                return Result.success(stationsData.getOrNull()?.body?.devices?.find { it.id == stationId })
+            }
+        } else {
+            stationsData.exceptionOrNull()?.let { exception ->
+                return Result.failure(exception)
+            }
         }
-        return null
+        return Result.failure(IOException("Something failed"))
     }
 
     fun getSelectedStationId(): String? {

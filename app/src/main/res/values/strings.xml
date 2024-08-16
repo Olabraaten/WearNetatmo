@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">Wear Netatmo</string>
+    <string name="app_name">Netatmo</string>
+    <string name="service_name">Temperature</string>
     <string name="log_in_button">Log in</string>
     <string name="log_in_button_description">On phone</string>
     <string name="log_out_button">Log out</string>
