@@ -1,32 +1,34 @@
 package solutions.silly.wearnetatmo.model
 
-import com.squareup.moshi.Json
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class DeviceDashboardData(
-    @field:Json(name = "time_utc")
-    val timeUtc: Long?,
-    @field:Json(name = "Temperature")
-    val temperature: Double?,
-    @field:Json(name = "CO2")
-    val co2: Int?,
-    @field:Json(name = "Humidity")
-    val humidity: Int?,
-    @field:Json(name = "Noise")
-    val noise: Int?,
-    @field:Json(name = "Pressure")
-    val pressure: Double?,
-    @field:Json(name = "AbsolutePressure")
-    val absolutePressure: Double?,
-    @field:Json(name = "min_temp")
-    val minTemp: Double?,
-    @field:Json(name = "max_temp")
-    val maxTemp: Double?,
-    @field:Json(name = "date_max_temp")
-    val dateMaxTemp: Long?,
-    @field:Json(name = "date_min_temp")
-    val dateMinTemp: Long?,
-    @field:Json(name = "temp_trend")
-    val tempTrend: String?,
-    @field:Json(name = "pressure_trend")
-    val pressureTrend: String?,
+    @SerialName("time_utc")
+    val timeUtc: Long? = null,
+    @SerialName("Temperature")
+    val temperature: Double? = null,
+    @SerialName("CO2")
+    val co2: Int? = null,
+    @SerialName("Humidity")
+    val humidity: Int? = null,
+    @SerialName("Noise")
+    val noise: Int? = null,
+    @SerialName("Pressure")
+    val pressure: Double? = null,
+    @SerialName("AbsolutePressure")
+    val absolutePressure: Double? = null,
+    @SerialName("min_temp")
+    val minTemp: Double? = null,
+    @SerialName("max_temp")
+    val maxTemp: Double? = null,
+    @SerialName("date_max_temp")
+    val dateMaxTemp: Long? = null,
+    @SerialName("date_min_temp")
+    val dateMinTemp: Long? = null,
+    @SerialName("temp_trend")
+    val tempTrend: String? = null,
+    @SerialName("pressure_trend")
+    val pressureTrend: String? = null,
 )

@@ -8,10 +8,12 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import solutions.silly.wearnetatmo.BuildConfig
 import solutions.silly.wearnetatmo.MASTER_KEY_ALIAS
 import solutions.silly.wearnetatmo.SHARED_PREFS_FILENAME
@@ -32,6 +34,10 @@ internal object AppModule {
         )
     }
 
+    private val json = Json {
+        ignoreUnknownKeys = true
+    }
+
     @Provides
     fun provideNetatmoService(): NetatmoService {
         val logInterceptor = HttpLoggingInterceptor()
@@ -44,7 +50,11 @@ internal object AppModule {
         val retrofit = Retrofit.Builder()
             .client(client)
             .baseUrl("https://api.netatmo.com")
-            .addConverterFactory(MoshiConverterFactory.create())
+            .addConverterFactory(
+                json.asConverterFactory(
+                    "application/json; charset=UTF8".toMediaType()
+                )
+            )
             .build()
         return retrofit.create(NetatmoService::class.java)
     }

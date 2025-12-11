@@ -1,12 +1,14 @@
 package solutions.silly.wearnetatmo.model
 
-import com.squareup.moshi.Json
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class StationsData(
-    val body: Body?,
-    val status: String?,
-    @field:Json(name = "time_exec")
-    val timeExec: String?,
-    @field:Json(name = "time_server")
-    val timeServer: String?,
+    val body: Body? = null,
+    val status: String? = null,
+    @SerialName("time_exec")
+    val timeExec: Double? = null,
+    @SerialName("time_server")
+    val timeServer: Double? = null,
 )

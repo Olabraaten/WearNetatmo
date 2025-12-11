@@ -24,7 +24,7 @@ class ComplicationProvider : SuspendingComplicationDataSourceService() {
             text = "24.7"
         ).build()
         val text = PlainComplicationText.Builder(
-            text = "12.3"
+            text = "\uD83C\uDF24 12.3"
         ).build()
         return ShortTextComplicationData.Builder(
             text = text,
@@ -55,7 +55,7 @@ class ComplicationProvider : SuspendingComplicationDataSourceService() {
                     text = inside
                 ).build()
                 val text = PlainComplicationText.Builder(
-                    text = outside
+                    text = "\uD83C\uDF24 $outside"
                 ).build()
                 return ShortTextComplicationData.Builder(
                     text = text,
