@@ -4,11 +4,13 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import retrofit2.HttpException
 import solutions.silly.wearnetatmo.ACCESS_TOKEN_KEY
 import solutions.silly.wearnetatmo.CACHE_DURATION
 import solutions.silly.wearnetatmo.EXPIRES_TOKEN_KEY
 import solutions.silly.wearnetatmo.REFRESH_TOKEN_KEY
+import solutions.silly.wearnetatmo.SELECTED_STATION_CACHE_KEY
 import solutions.silly.wearnetatmo.SELECTED_STATION_KEY
 import solutions.silly.wearnetatmo.SecretConstants
 import solutions.silly.wearnetatmo.SecretConstants.NETATMO_REDIRECT_URI
@@ -29,6 +31,7 @@ class NetatmoRepository @Inject constructor(
 ) {
     private var stationsDataCache: StationsData? = null
     private var stationsDataCacheExpiresTimestamp = 0L
+    private val json = Json { ignoreUnknownKeys = true }
 
     suspend fun getToken(code: String): Result<NetatmoToken> {
         try {
@@ -54,6 +57,7 @@ class NetatmoRepository @Inject constructor(
                 remove(ACCESS_TOKEN_KEY)
                 remove(REFRESH_TOKEN_KEY)
                 remove(EXPIRES_TOKEN_KEY)
+                remove(SELECTED_STATION_CACHE_KEY)
             }
         }
         stationsDataCache = null
@@ -88,7 +92,9 @@ class NetatmoRepository @Inject constructor(
         val stationsData = getStationsData()
         if (stationsData.isSuccess) {
             getSelectedStationId()?.let { stationId ->
-                return Result.success(stationsData.getOrNull()?.body?.devices?.find { it.id == stationId })
+                val station = stationsData.getOrNull()?.body?.devices?.find { it.id == stationId }
+                cacheSelectedStation(station)
+                return Result.success(station)
             }
         } else {
             stationsData.exceptionOrNull()?.let { exception ->
@@ -96,6 +102,20 @@ class NetatmoRepository @Inject constructor(
             }
         }
         return Result.failure(IOException("Something failed"))
+    }
+
+    fun getCachedSelectedStation(): Device? {
+        val stationsData = stationsDataCache
+        val stationId = getSelectedStationId() ?: return null
+        if (stationsData != null) {
+            val cachedStation = stationsData.body?.devices?.find { it.id == stationId }
+            if (cachedStation != null) {
+                return cachedStation
+            }
+        }
+        val cachedJson =
+            sharedPreferences.getString(SELECTED_STATION_CACHE_KEY, null) ?: return null
+        return runCatching { json.decodeFromString<Device>(cachedJson) }.getOrNull()
     }
 
     fun getSelectedStationId(): String? {
@@ -153,6 +173,17 @@ class NetatmoRepository @Inject constructor(
                     val expires = Date().time + (expiresIn * 1000)
                     putLong(EXPIRES_TOKEN_KEY, expires)
                 }
+            }
+        }
+    }
+
+    private fun cacheSelectedStation(station: Device?) {
+        val jsonValue = station?.let { json.encodeToString(it) }
+        sharedPreferences.edit {
+            if (jsonValue == null) {
+                remove(SELECTED_STATION_CACHE_KEY)
+            } else {
+                putString(SELECTED_STATION_CACHE_KEY, jsonValue)
             }
         }
     }

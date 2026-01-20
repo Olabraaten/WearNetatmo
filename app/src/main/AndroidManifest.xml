@@ -25,6 +25,7 @@
         <activity
             android:name=".presentation.ConfigActivity"
             android:exported="true"
+            android:taskAffinity="solutions.silly.config"
             android:theme="@android:style/Theme.DeviceDefault">
             <intent-filter>
                 <action android:name="solutions.silly.PROVIDER_CONFIG_ACTION" />
@@ -51,9 +52,6 @@
             <meta-data
                 android:name="android.support.wearable.complications.SUPPORTED_TYPES"
                 android:value="SHORT_TEXT" />
-            <meta-data
-                android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS"
-                android:value="900" />
         </service>
 
         <receiver android:name=".complication.ComplicationTapBroadcastReceiver" />

@@ -6,6 +6,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
+import solutions.silly.wearnetatmo.work.NetatmoSyncWorker
 
 class ComplicationTapBroadcastReceiver : BroadcastReceiver() {
 
@@ -14,6 +15,9 @@ class ComplicationTapBroadcastReceiver : BroadcastReceiver() {
         val dataSource = extras.getParcelable<ComponentName>(EXTRA_DATA_SOURCE_COMPONENT) ?: return
         val complicationId = extras.getInt(EXTRA_COMPLICATION_ID)
 
+        NetatmoSyncWorker.enqueueOneTime(context)
+
+        // TODO: Might want to remove this?
         val complicationDataSourceUpdateRequester =
             ComplicationDataSourceUpdateRequester.create(
                 context = context,
